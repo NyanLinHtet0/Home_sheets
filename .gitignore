@@ -1,0 +1,4 @@
+node_modules/
+dist/
+backend/data/master.json
+backend/data/books/*.json
