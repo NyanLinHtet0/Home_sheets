@@ -11,22 +11,12 @@ export default function BookDetailPage() {
   const [message, setMessage] = useState("");
   const [editingEntryId, setEditingEntryId] = useState(null);
   const [verifiedDateInput, setVerifiedDateInput] = useState("");
-  const [bookNameInput, setBookNameInput] = useState("");
-  const [bookDescriptionInput, setBookDescriptionInput] = useState("");
 
   async function loadBook() {
     const response = await fetch(`${API}/books/${bookId}`);
     const data = await response.json();
-
-    if (!response.ok) {
-      setError(data.error || "Failed to load book");
-      return;
-    }
-
     setBook(data);
     setVerifiedDateInput(data.verifiedDate ? data.verifiedDate.slice(0, 16) : "");
-    setBookNameInput(data.name ?? "");
-    setBookDescriptionInput(data.description ?? "");
   }
 
   useEffect(() => {
@@ -47,7 +37,6 @@ export default function BookDetailPage() {
     }
 
     setBook(data);
-    setMessage("Entry added.");
     setError("");
   }
 
@@ -66,7 +55,6 @@ export default function BookDetailPage() {
 
     setBook(data);
     setEditingEntryId(null);
-    setMessage("Entry updated.");
     setError("");
   }
 
@@ -82,7 +70,6 @@ export default function BookDetailPage() {
     }
 
     setBook(data);
-    setMessage("Entry deleted.");
     setError("");
   }
 
@@ -96,7 +83,6 @@ export default function BookDetailPage() {
       })
     });
     const data = await response.json();
-
     if (!response.ok) {
       setError(data.error || "Failed to set verified date");
       return;
@@ -104,30 +90,6 @@ export default function BookDetailPage() {
 
     setBook(data);
     setMessage("Verified date updated.");
-    setError("");
-  }
-
-  async function updateBookMetadata(event) {
-    event.preventDefault();
-
-    const response = await fetch(`${API}/books/${bookId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: bookNameInput,
-        description: bookDescriptionInput
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      setError(data.error || "Failed to update book metadata");
-      return;
-    }
-
-    setBook(data);
-    setMessage("Book details updated.");
     setError("");
   }
 
@@ -142,27 +104,7 @@ export default function BookDetailPage() {
         <h2>{book.name}</h2>
         <strong>Balance: {book.balance}</strong>
       </div>
-
-      <form className="grid-form" onSubmit={updateBookMetadata}>
-        <label>
-          Book name
-          <input
-            required
-            value={bookNameInput}
-            onChange={(event) => setBookNameInput(event.target.value)}
-          />
-        </label>
-
-        <label>
-          Description
-          <input
-            value={bookDescriptionInput}
-            onChange={(event) => setBookDescriptionInput(event.target.value)}
-          />
-        </label>
-
-        <button type="submit">Update book details</button>
-      </form>
+      <p>{book.description || "No description"}</p>
 
       <form className="row" onSubmit={updateVerifiedDate}>
         <label>
@@ -203,8 +145,8 @@ export default function BookDetailPage() {
               <td>{new Date(entry.date).toLocaleString()}</td>
               <td>{entry.notes || "-"}</td>
               <td>
-                <button type="button" onClick={() => setEditingEntryId(entry.id)}>Edit</button>{" "}
-                <button type="button" onClick={() => removeEntry(entry.id)}>Delete</button>
+                <button onClick={() => setEditingEntryId(entry.id)}>Edit</button>{" "}
+                <button onClick={() => removeEntry(entry.id)}>Delete</button>
               </td>
             </tr>
           ))}
@@ -215,8 +157,10 @@ export default function BookDetailPage() {
         <section>
           <h3>Edit entry</h3>
           <BookForm
-            key={editingEntryId}
-            defaultValue={rows.find((item) => item.id === editingEntryId)}
+            defaultValue={{
+              ...rows.find((item) => item.id === editingEntryId),
+              date: rows.find((item) => item.id === editingEntryId).date.slice(0, 16)
+            }}
             onSubmit={(payload) => updateEntry(editingEntryId, payload)}
             submitLabel="Update entry"
           />

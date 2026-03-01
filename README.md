@@ -48,14 +48,3 @@ npm run dev
 ```
 Frontend runs on `http://localhost:5173`.
 
-
-## Common issue: "Cannot GET /"
-
-If you open `http://localhost:4000` (backend) you may see `Cannot GET /` or a plain backend message.
-That is expected: the **UI is served by Vite** on `http://localhost:5173`.
-
-Use:
-- Backend health/API: `http://localhost:4000/api/health`
-- Frontend app UI: `http://localhost:5173`
-
-Make sure both processes are running in separate terminals (`npm run dev` in `backend/` and `frontend/`).

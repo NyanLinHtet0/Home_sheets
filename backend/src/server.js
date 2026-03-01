@@ -8,7 +8,6 @@ import {
   loadFromDisk,
   saveToDisk,
   setVerifiedDate,
-  updateBookMetadata,
   updateEntry
 } from "./dataStore.js";
 
@@ -20,12 +19,6 @@ app.use(express.json());
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
-});
-
-app.get("/", (_req, res) => {
-  res.status(200).send(
-    "Home Sheets backend is running. Use /api/* endpoints (e.g. /api/health). Frontend runs separately on http://localhost:5173."
-  );
 });
 
 app.get("/api/books", (_req, res) => {
@@ -40,15 +33,6 @@ app.get("/api/books/:bookId", (req, res) => {
     return res.status(404).json({ error: "Book not found." });
   }
   return res.json(book);
-});
-
-app.put("/api/books/:bookId", (req, res) => {
-  try {
-    const book = updateBookMetadata(req.params.bookId, req.body);
-    return res.json(book);
-  } catch (error) {
-    return res.status(400).json({ error: error.message });
-  }
 });
 
 app.post("/api/books/:bookId/entries", (req, res) => {
@@ -94,16 +78,6 @@ app.post("/api/save", async (_req, res) => {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-});
-
-app.use((req, res) => {
-  if (req.path.startsWith("/api/")) {
-    return res.status(404).json({ error: "API route not found." });
-  }
-
-  return res.status(404).send(
-    "Route not found. For the app UI, open http://localhost:5173. For backend health, open /api/health."
-  );
 });
 
 await loadFromDisk();

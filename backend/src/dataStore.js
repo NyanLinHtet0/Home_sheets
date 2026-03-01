@@ -47,14 +47,6 @@ function assertValidDate(value) {
   return parsed.toISOString();
 }
 
-function assertBookName(value) {
-  const name = String(value ?? "").trim();
-  if (!name) {
-    throw new Error("Book name is required.");
-  }
-  return name;
-}
-
 function isBeforeVerifiedDate(entryDate, verifiedDate) {
   if (!verifiedDate) return false;
   return new Date(entryDate).getTime() < new Date(verifiedDate).getTime();
@@ -116,16 +108,6 @@ function getBookById(bookId) {
   const found = state.books.find((book) => book.id === bookId);
   if (!found) return null;
   return sanitizeBook(found);
-}
-
-function updateBookMetadata(bookId, payload) {
-  const book = state.books.find((item) => item.id === bookId);
-  if (!book) throw new Error("Book not found.");
-
-  book.name = assertBookName(payload.name);
-  book.description = String(payload.description ?? "").trim();
-
-  return sanitizeBook(book);
 }
 
 function addEntry(bookId, payload) {
@@ -241,6 +223,5 @@ export {
   loadFromDisk,
   saveToDisk,
   setVerifiedDate,
-  updateBookMetadata,
   updateEntry
 };
